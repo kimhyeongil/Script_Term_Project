@@ -29,6 +29,7 @@ class MainGUI:
                              range(4)]
         for i in range(4):
             self.chargeLabels[i].place(x=0, y=50 + (i * 16 * 7))
+
         self.cityList['values'] = testCity
         self.cityList.place(x=0, y=10)
 
@@ -39,6 +40,18 @@ class MainGUI:
         self.nextButton.place(x=7.7 * 14, y=50 + (4 * 16 * 7))
 
         self.chargeFrame.place(x=225, y=10)
+
+        self.infoFrame = Frame(self.window, width=600, height=600)
+        self.infoCanvas = Canvas(self.infoFrame, width=475, height=475, bg='white')
+        self.infoCanvas.place(x=0, y=25)
+
+        self.mailButton = Button(self.infoFrame, width=12, height=5, bg='black')
+        self.mailButton.place(x=300, y=50 + (4 * 16 * 7))
+
+        self.mapButton = Button(self.infoFrame, width=12, height=5, bg='black')
+        self.mapButton.place(x=100, y=50 + (4 * 16 * 7))
+
+        self.infoFrame.place(x=475, y=0)
 
         self.window.mainloop()
 
