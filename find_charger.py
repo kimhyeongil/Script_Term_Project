@@ -9,23 +9,25 @@ class MainGUI:
         self.window.geometry('1000x600')
 
         self.menuFrame = Frame(self.window)
+        searchImg = PhotoImage(file='검색창.png')
+        self.searchButton = Button(self.menuFrame, text='검색', bg='white', image=searchImg)
+        self.searchButton.grid(row=1, column=0, padx=7, pady=7)
 
-        self.searchButton = Button(self.menuFrame, text='검색', width=18, height=8, bg='white')
-        self.searchButton.grid(row=1, column=0, padx=7, pady=20)
+        favoriteImg = PhotoImage(file='즐겨찾기창.png')
+        self.favoritesButton = Button(self.menuFrame, text='즐찾', bg='white', image=favoriteImg)
+        self.favoritesButton.grid(row=2, column=0, padx=7, pady=7)
 
-        self.favoritesButton = Button(self.menuFrame, text='즐찾', width=18, height=8, bg='white')
-        self.favoritesButton.grid(row=2, column=0, padx=7, pady=20)
-
-        self.graphButton = Button(self.menuFrame, text='그래프', width=18, height=8, bg='white')
-        self.graphButton.grid(row=3, column=0, padx=7, pady=20)
+        graphImg = PhotoImage(file='그래프창.png')
+        self.graphButton = Button(self.menuFrame, text='그래프', bg='white', image=graphImg)
+        self.graphButton.grid(row=3, column=0, padx=7, pady=7)
 
         self.menuFrame.place(x=25, y=50)
 
-        self.chargeFrame = Frame(self.window, width=400, height=600)
-        self.cityList = Combobox(self.chargeFrame)
+        self.searchFrame = Frame(self.window, width=1000, height=600)
+        self.cityList = Combobox(self.searchFrame)
         self.cityList.set('시/군')
         testCity = ['1', '2', '3']
-        self.chargeLabels = [Label(self.chargeFrame, width=30, height=7, bg='white' if i & 1 else 'black') for i in
+        self.chargeLabels = [Label(self.searchFrame, width=34, height=7, bg='white' if i & 1 else 'blue') for i in
                              range(4)]
         for i in range(4):
             self.chargeLabels[i].place(x=0, y=50 + (i * 16 * 7))
@@ -33,25 +35,30 @@ class MainGUI:
         self.cityList['values'] = testCity
         self.cityList.place(x=0, y=10)
 
-        self.prevButton = Button(self.chargeFrame, width=14, height=3)
-        self.nextButton = Button(self.chargeFrame, width=14, height=3)
+        prevImg = PhotoImage(file='왼쪽이동.png')
+        nextImg = PhotoImage(file='오른쪽이동.png')
+        self.prevButton = Button(self.searchFrame, bg='white', image=prevImg)
+        self.nextButton = Button(self.searchFrame, bg='white', image=nextImg)
 
-        self.prevButton.place(x=0, y=50 + (4 * 16 * 7))
-        self.nextButton.place(x=7.7 * 14, y=50 + (4 * 16 * 7))
+        self.prevButton.place(x=50, y=50 + (4 * 16 * 7))
+        self.nextButton.place(x=124, y=50 + (4 * 16 * 7))
 
-        self.chargeFrame.place(x=225, y=10)
+        self.infoCanvas = Canvas(self.searchFrame, width=475, height=475, bg='white')
+        self.infoCanvas.place(x=275, y=10)
 
-        self.infoFrame = Frame(self.window, width=600, height=600)
-        self.infoCanvas = Canvas(self.infoFrame, width=475, height=475, bg='white')
-        self.infoCanvas.place(x=0, y=25)
+        mailImg = PhotoImage(file='이메일.png')
+        self.mailButton = Button(self.searchFrame, bg='white', image=mailImg)
+        self.mailButton.place(x=475, y=500)
 
-        self.mailButton = Button(self.infoFrame, width=12, height=5, bg='black')
-        self.mailButton.place(x=300, y=50 + (4 * 16 * 7))
+        mapImg = PhotoImage(file='지도.png')
+        self.mapButton = Button(self.searchFrame, bg='white', image=mapImg)
+        self.mapButton.place(x=325, y=500)
 
-        self.mapButton = Button(self.infoFrame, width=12, height=5, bg='black')
-        self.mapButton.place(x=100, y=50 + (4 * 16 * 7))
+        telegramImg = PhotoImage(file='텔레그램.png')
+        self.telegramButton = Button(self.searchFrame, bg='white', image=telegramImg)
+        self.telegramButton.place(x=625, y=500)
 
-        self.infoFrame.place(x=475, y=0)
+        self.searchFrame.place(x=215, y=10)
 
         self.window.mainloop()
 
