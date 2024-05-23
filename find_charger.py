@@ -6,7 +6,7 @@ class MainGUI:
     def __init__(self):
         self.window = Tk()
         self.window.title('Find Charger')
-        self.window.geometry('800x600')
+        self.window.geometry('1000x600')
 
         self.menuFrame = Frame(self.window)
 
@@ -20,6 +20,25 @@ class MainGUI:
         self.graphButton.grid(row=3, column=0, padx=7, pady=20)
 
         self.menuFrame.place(x=25, y=50)
+
+        self.chargeFrame = Frame(self.window, width=400, height=600)
+        self.cityList = Combobox(self.chargeFrame)
+        self.cityList.set('시/군')
+        testCity = ['1', '2', '3']
+        self.chargeLabels = [Label(self.chargeFrame, width=30, height=7, bg='white' if i & 1 else 'black') for i in
+                             range(4)]
+        for i in range(4):
+            self.chargeLabels[i].place(x=0, y=50 + (i * 16 * 7))
+        self.cityList['values'] = testCity
+        self.cityList.place(x=0, y=10)
+
+        self.prevButton = Button(self.chargeFrame, width=14, height=3)
+        self.nextButton = Button(self.chargeFrame, width=14, height=3)
+
+        self.prevButton.place(x=0, y=50 + (4 * 16 * 7))
+        self.nextButton.place(x=7.7 * 14, y=50 + (4 * 16 * 7))
+
+        self.chargeFrame.place(x=225, y=10)
 
         self.window.mainloop()
 
