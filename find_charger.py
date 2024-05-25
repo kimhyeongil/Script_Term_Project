@@ -10,19 +10,40 @@ class MainGUI:
         self.window.title('Find Charger')
         self.window.geometry('1000x600')
 
-        self.cities = {'가평군': [42], '고양시': [85, 86, 87], '과천시': [21], '광명시': [16],
-                       '광주시': [39], '구리시': [22], '군포시': [24], '김포시': [47], '남양주시': [27], '동두천시': [18],
-                       '부천시': [64, 62, 63, 61], '성남시': [70, 68, 69],
-                       '수원시': [75, 77, 74, 76], '시흥시': [26],
-                       '안산시': [49, 19], '안성시': [46], '안양시': [81, 80],
-                       '양주시': [31], '양평군': [43], '여주시': [33], '연천군': [40], '오산시': [23], '용인시': [90, 91, 45],
-                       '의왕시': [25], '의정부시': [13], '이천시': [44], '파주시': [37], '평택시': [17], '포천시': [41], '하남시': [28],
-                       '화성시': [35]}
+        self.url = "https://bigdata.kepco.co.kr/openapi/v1/EVcharge.do"
+        self.key = "GqAUvg9r8nJl20eWk533DCrJwwcbm81kst6Z0fEW"
+
+        self.cities = {'가평군': ['가평군'], '고양시': ['고양시 덕양구', '고양시 일산동구', '고양시 일산서구'],
+                       '과천시': ['과천시'], '광명시': ['광명시'], '광주시': ['광주시'], '구리시': ['구리시'],
+                       '군포시': ['군포시'], '김포시': ['김포시'], '남양주시': ['남양주시'], '동두천시': ['동두천시'],
+                       '부천시': ['부천시'], '성남시': ['성남시 분당구', '성남시 수정구', '성남시 중원구'],
+                       '수원시': ['수원시 권선구', '수원시 영통구', '수원시 장안구', '수원시 팔달구'],
+                       '시흥시': ['시흥시'], '안산시': ['안산시 단원구', '안산시 상록구'], '안성시': ['안성시'],
+                       '안양시': ['안양시 동안구', '안양시 만안구'], '양주시': ['양주시'], '양평군': ['양평군'],
+                       '여주시': ['여주시'], '연천군': ['연천군'], '오산시': ['오산시'],
+                       '용인시': ['용인시 기흥구', '용인시 수지구', '용인시 처인구'], '의왕시': ['의왕시'],
+                       '의정부시': ['의정부시'], '이천시': ['이천시'], '파주시': ['파주시'], '평택시': ['평택시'],
+                       '포천시': ['포천시'], '하남시': ['하남시'], '화성시': ['화성시']}
+
+        params = {
+            "metroCd": 31,
+            "apiKey": self.key
+        }
+        ret = requests.get(self.url, params=params).json()['data']
+        self.chargeInfos = {city:[] for city in self.cities.keys()}
+        for data in ret:
+            for city in self.cities.keys():
+                if data['city'] in self.cities[city]:
+                    self.chargeInfos[city].append(data)
 
         self.initMenu()
         self.initSearch()
 
         self.window.mainloop()
+
+    def OnComboboxSelect(self, event):
+        city = self.cityCombobox.get()
+        print(self.chargeInfos[city])
 
     def initMenu(self):
         self.menuFrame = Frame(self.window)
@@ -46,6 +67,7 @@ class MainGUI:
         self.cityCombobox = Combobox(self.searchFrame)
         self.cityCombobox.set('시/군')
         self.cityCombobox['values'] = list(self.cities.keys())
+        self.cityCombobox.bind("<<ComboboxSelected>>", self.OnComboboxSelect)
         self.cityCombobox.place(x=0, y=10)
 
         self.chargeLabels = [Label(self.searchFrame, width=34, height=7, bg='white' if i & 1 else 'blue') for i in
