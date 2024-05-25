@@ -29,8 +29,9 @@ class MainGUI:
             "metroCd": 31,
             "apiKey": self.key
         }
+
         ret = requests.get(self.url, params=params).json()['data']
-        self.chargeInfos = {city:[] for city in self.cities.keys()}
+        self.chargeInfos = {city: [] for city in self.cities.keys()}
         for data in ret:
             for city in self.cities.keys():
                 if data['city'] in self.cities[city]:
@@ -43,7 +44,8 @@ class MainGUI:
 
     def OnComboboxSelect(self, event):
         city = self.cityCombobox.get()
-        print(self.chargeInfos[city])
+        for i in range(4):
+            self.chargeLabels[i]['text'] = f"주소: {self.chargeInfos[city][i]['stnAddr']}\n장소: {self.chargeInfos[city][i]['stnPlace']}"
 
     def initMenu(self):
         self.menuFrame = Frame(self.window)
@@ -70,8 +72,10 @@ class MainGUI:
         self.cityCombobox.bind("<<ComboboxSelected>>", self.OnComboboxSelect)
         self.cityCombobox.place(x=0, y=10)
 
-        self.chargeLabels = [Label(self.searchFrame, width=34, height=7, bg='white' if i & 1 else 'blue') for i in
-                             range(4)]
+        self.chargeLabels = [Label(self.searchFrame, width=34, height=7, wraplength=270,
+                                   font=('arial', 12, 'bold'), anchor="nw", justify="left",
+                                   bg='#f9f6f2' if i & 1 else '#D3D3D3')
+                             for i in range(4)]
         for i in range(4):
             self.chargeLabels[i].place(x=0, y=50 + (i * 16 * 7))
 
