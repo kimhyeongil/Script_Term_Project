@@ -25,7 +25,7 @@ class MainGUI:
                        '용인시': ['용인시 기흥구', '용인시 수지구', '용인시 처인구'], '의왕시': ['의왕시'],
                        '의정부시': ['의정부시'], '이천시': ['이천시'], '파주시': ['파주시'], '평택시': ['평택시'],
                        '포천시': ['포천시'], '하남시': ['하남시'], '화성시': ['화성시']}
-        self.index = 0
+        self.page = 0
 
         params = {
             "metroCd": 31,
@@ -49,24 +49,32 @@ class MainGUI:
     def showChargeList(self):
         city = self.cityCombobox.get()
         for i in range(4):
-            if i + self.index * 4 < len(self.chargeInfos[city]):
+            if i + self.page * 4 < len(self.chargeInfos[city]):
                 self.chargeLabels[i][
-                    'text'] = f"주소: {self.chargeInfos[city][i + self.index * 4]['stnAddr']}\n장소: {self.chargeInfos[city][i + self.index * 4]['stnPlace']}"
+                    'text'] = f"주소: {self.chargeInfos[city][i + self.page * 4]['stnAddr']}\n장소: {self.chargeInfos[city][i + self.page * 4]['stnPlace']}"
             else:
                 self.chargeLabels[i]['text'] = ''
 
     def OnComboboxSelect(self, event):
-        self.index = 0
+        self.page = 0
         self.showChargeList()
+
+    def OnInfoListLabelClick(self, event, index):
+        city = self.cityCombobox.get()
+        if city in self.cities:
+            if index + self.page * 4 < len(self.chargeInfos[city]):
+                self.infoCanvas.delete('all')
+                self.infoCanvas.create_text(100, 30,
+                                            text=str(self.chargeInfos[city][index + self.page * 4]['rapidCnt']))
 
     def nextPage(self):
         if self.cityCombobox.get() in self.cities:
-            self.index = min(self.index + 1, (len(self.chargeInfos[self.cityCombobox.get()]) - 1) // 4)
+            self.page = min(self.page + 1, (len(self.chargeInfos[self.cityCombobox.get()]) - 1) // 4)
             self.showChargeList()
 
     def prevPage(self):
         if self.cityCombobox.get() in self.cities:
-            self.index = max(self.index - 1, 0)
+            self.page = max(self.page - 1, 0)
             self.showChargeList()
 
     def initMenu(self):
@@ -99,6 +107,7 @@ class MainGUI:
                                    bg='#f9f6f2' if i & 1 else '#D3D3D3')
                              for i in range(4)]
         for i in range(4):
+            self.chargeLabels[i].bind("<Button-1>", lambda event, index=i: self.OnInfoListLabelClick(event, index))
             self.chargeLabels[i].place(x=0, y=50 + (i * 16 * 7))
 
         self.prevImg = PhotoImage(file='왼쪽이동.png')
