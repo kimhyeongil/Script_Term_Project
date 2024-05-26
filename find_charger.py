@@ -1,3 +1,4 @@
+import time
 from tkinter import *
 from tkinter.ttk import Combobox
 
@@ -24,6 +25,7 @@ class MainGUI:
                        '용인시': ['용인시 기흥구', '용인시 수지구', '용인시 처인구'], '의왕시': ['의왕시'],
                        '의정부시': ['의정부시'], '이천시': ['이천시'], '파주시': ['파주시'], '평택시': ['평택시'],
                        '포천시': ['포천시'], '하남시': ['하남시'], '화성시': ['화성시']}
+        self.index = 0
 
         params = {
             "metroCd": 31,
@@ -31,21 +33,41 @@ class MainGUI:
         }
 
         ret = requests.get(self.url, params=params).json()['data']
+        start = time.time()
         self.chargeInfos = {city: [] for city in self.cities.keys()}
         for data in ret:
             for city in self.cities.keys():
                 if data['city'] in self.cities[city]:
                     self.chargeInfos[city].append(data)
-
+        end = time.time()
+        print(end - start)
         self.initMenu()
         self.initSearch()
 
         self.window.mainloop()
 
-    def OnComboboxSelect(self, event):
+    def showChargeList(self):
         city = self.cityCombobox.get()
         for i in range(4):
-            self.chargeLabels[i]['text'] = f"주소: {self.chargeInfos[city][i]['stnAddr']}\n장소: {self.chargeInfos[city][i]['stnPlace']}"
+            if i + self.index * 4 < len(self.chargeInfos[city]):
+                self.chargeLabels[i][
+                    'text'] = f"주소: {self.chargeInfos[city][i + self.index * 4]['stnAddr']}\n장소: {self.chargeInfos[city][i + self.index * 4]['stnPlace']}"
+            else:
+                self.chargeLabels[i]['text'] = ''
+
+    def OnComboboxSelect(self, event):
+        self.index = 0
+        self.showChargeList()
+
+    def nextPage(self):
+        if self.cityCombobox.get() in self.cities:
+            self.index = min(self.index + 1, (len(self.chargeInfos[self.cityCombobox.get()]) - 1) // 4)
+            self.showChargeList()
+
+    def prevPage(self):
+        if self.cityCombobox.get() in self.cities:
+            self.index = max(self.index - 1, 0)
+            self.showChargeList()
 
     def initMenu(self):
         self.menuFrame = Frame(self.window)
@@ -81,8 +103,8 @@ class MainGUI:
 
         self.prevImg = PhotoImage(file='왼쪽이동.png')
         self.nextImg = PhotoImage(file='오른쪽이동.png')
-        self.prevButton = Button(self.searchFrame, bg='white', image=self.prevImg)
-        self.nextButton = Button(self.searchFrame, bg='white', image=self.nextImg)
+        self.prevButton = Button(self.searchFrame, bg='white', image=self.prevImg, command=self.prevPage)
+        self.nextButton = Button(self.searchFrame, bg='white', image=self.nextImg, command=self.nextPage)
 
         self.prevButton.place(x=50, y=50 + (4 * 16 * 7))
         self.nextButton.place(x=124, y=50 + (4 * 16 * 7))
