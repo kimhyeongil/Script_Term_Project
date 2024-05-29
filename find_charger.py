@@ -1,9 +1,10 @@
-import time
+import io
 from tkinter import *
 from tkinter.ttk import Combobox
 
 import requests
-
+from googlemaps import Client
+from PIL import Image, ImageTk
 
 class MainGUI:
     def __init__(self):
@@ -33,14 +34,18 @@ class MainGUI:
         }
 
         ret = requests.get(self.url, params=params).json()['data']
-        start = time.time()
+
         self.chargeInfos = {city: [] for city in self.cities.keys()}
         for data in ret:
             for city in self.cities.keys():
                 if data['city'] in self.cities[city]:
                     self.chargeInfos[city].append(data)
-        end = time.time()
-        print(end - start)
+
+        self.Google_API_Key = 'AIzaSyCzFgc9OGnXckq1-JNhSCVGo9zIq1kSWcE'
+        self.gmaps = Client(key=self.Google_API_Key)
+
+        self.isGraph = True
+
         self.initMenu()
         self.initSearch()
 
@@ -60,33 +65,64 @@ class MainGUI:
         self.page = 0
         self.showChargeList()
 
-    def OnInfoListLabelClick(self, event, index):
+    def OnClickInfoListLabel(self, event, index):
         city = self.cityCombobox.get()
-        index = index + self.page * len(self.chargeLabels)
+
         if city in self.cities:
-            if index < len(self.chargeInfos[city]):
-                self.infoCanvas.delete('all')
+            if index + self.page * len(self.chargeLabels) < len(self.chargeInfos[city]):
+                self.index = index + self.page * len(self.chargeLabels)
+                if self.isGraph:
+                    self.showGraph()
+                else:
+                    self.showChargeMap()
 
-                self.infoCanvas.create_text(10, 20, text=self.chargeInfos[city][index]['stnAddr'],
-                                            anchor="w", font=('consolas', 12, 'bold'))
-                offset = int(self.infoCanvas['height']) - 50
-                height = 35
+    def showGraph(self):
+        city = self.cityCombobox.get()
+        self.infoCanvas.delete('all')
 
-                rapidCnt = self.chargeInfos[city][index]['rapidCnt']
-                self.infoCanvas.create_rectangle(100, offset, 200, offset - height * rapidCnt, fill='red')
-                self.infoCanvas.create_text(106, offset + 20, text='급속 충전기',
-                                            anchor="w", font=('consolas', 12, 'bold'))
-                self.infoCanvas.create_text(150, offset - height * rapidCnt - 20, text=str(rapidCnt),
-                                            font=('consolas', 12, 'bold'))
+        offset = int(self.infoCanvas['height']) - 50
+        height = 35
 
-                slowCnt = self.chargeInfos[city][index]['slowCnt']
-                self.infoCanvas.create_rectangle(300, offset, 400,
-                                                 offset - height * slowCnt,
-                                                 fill='red')
-                self.infoCanvas.create_text(306, offset + 20, text='완속 충전기',
-                                            anchor="w", font=('consolas', 12, 'bold'))
-                self.infoCanvas.create_text(350, offset - height * slowCnt - 20, text=str(slowCnt),
-                                            font=('consolas', 12, 'bold'))
+        rapidCnt = self.chargeInfos[city][self.index]['rapidCnt']
+        self.infoCanvas.create_rectangle(100, offset, 200, offset - height * rapidCnt, fill='red')
+        self.infoCanvas.create_text(106, offset + 20, text='급속 충전기',
+                                    anchor="w", font=('consolas', 12, 'bold'))
+        self.infoCanvas.create_text(150, offset - height * rapidCnt - 20, text=str(rapidCnt),
+                                    font=('consolas', 12, 'bold'))
+
+        slowCnt = self.chargeInfos[city][self.index]['slowCnt']
+        self.infoCanvas.create_rectangle(300, offset, 400,
+                                         offset - height * slowCnt,
+                                         fill='red')
+        self.infoCanvas.create_text(306, offset + 20, text='완속 충전기',
+                                    anchor="w", font=('consolas', 12, 'bold'))
+        self.infoCanvas.create_text(350, offset - height * slowCnt - 20, text=str(slowCnt),
+                                    font=('consolas', 12, 'bold'))
+        self.infoCanvas.create_text(10, 20, text=self.chargeInfos[city][self.index]['stnAddr'],
+                                    anchor="w", font=('consolas', 12, 'bold'))
+
+    def showChargeMap(self):
+        city = self.cityCombobox.get()
+        self.infoCanvas.delete('all')
+
+        center = self.gmaps.geocode(self.chargeInfos[city][self.index]['stnAddr'])[0]['geometry']['location']
+        mapURL = f"https://maps.googleapis.com/maps/api/staticmap?center={center['lat']},{center['lng']}&zoom={13}&size=500x500&maptype=roadmap"
+
+        mapret = requests.get(mapURL + '&key=' + self.Google_API_Key)
+        mapImg = Image.open(io.BytesIO(mapret.content))
+        self.photo = ImageTk.PhotoImage(mapImg)
+        self.infoCanvas.create_image(0, 0, anchor='nw', image=self.photo)
+        self.infoCanvas.create_text(10, 20, text=self.chargeInfos[city][self.index]['stnAddr'],
+                                    anchor="w", font=('consolas', 12, 'bold'))
+
+    def changeInfoType(self):
+        self.isGraph = not self.isGraph
+        if self.isGraph:
+            self.mapButton['image'] = self.mapImg
+            self.showGraph()
+        else:
+            self.mapButton['image'] = self.smallGraphImg
+            self.showChargeMap()
 
     def nextPage(self):
         if self.cityCombobox.get() in self.cities:
@@ -129,7 +165,7 @@ class MainGUI:
                                    bg='#f9f6f2' if i & 1 else '#D3D3D3')
                              for i in range(6)]
         for i in range(len(self.chargeLabels)):
-            self.chargeLabels[i].bind("<Button-1>", lambda event, index=i: self.OnInfoListLabelClick(event, index))
+            self.chargeLabels[i].bind("<Button-1>", lambda event, index=i: self.OnClickInfoListLabel(event, index))
             self.chargeLabels[i].place(x=0, y=50 + (i * 20 * 4))
 
         self.prevImg = PhotoImage(file='왼쪽이동.png')
@@ -148,7 +184,8 @@ class MainGUI:
         self.mailButton.place(x=490, y=515)
 
         self.mapImg = PhotoImage(file='지도.png')
-        self.mapButton = Button(self.searchFrame, bg='white', image=self.mapImg)
+        self.smallGraphImg = PhotoImage(file='그래프.png')
+        self.mapButton = Button(self.searchFrame, bg='white', image=self.mapImg, command=self.changeInfoType)
         self.mapButton.place(x=340, y=515)
 
         self.telegramImg = PhotoImage(file='텔레그램.png')
@@ -156,6 +193,9 @@ class MainGUI:
         self.telegramButton.place(x=640, y=515)
 
         self.searchFrame.place(x=215, y=10)
+
+
+
 
 
 MainGUI()
