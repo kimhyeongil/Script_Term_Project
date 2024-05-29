@@ -107,6 +107,7 @@ class MainGUI:
 
         center = self.gmaps.geocode(self.chargeInfos[city][self.index]['stnAddr'])[0]['geometry']['location']
         mapURL = f"https://maps.googleapis.com/maps/api/staticmap?center={center['lat']},{center['lng']}&zoom={13}&size=500x500&maptype=roadmap"
+        mapURL += f"&markers=color:red%7C{float(center['lat'])},{float(center['lng'])}"
 
         mapret = requests.get(mapURL + '&key=' + self.Google_API_Key)
         mapImg = Image.open(io.BytesIO(mapret.content))
