@@ -1,10 +1,15 @@
 import io
 from tkinter import *
+from tkinter import messagebox, simpledialog
 from tkinter.ttk import Combobox
 
 import requests
 from googlemaps import Client
 from PIL import Image, ImageTk
+
+import smtplib, ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 class MainGUI:
     def __init__(self):
@@ -125,6 +130,39 @@ class MainGUI:
             self.mapButton['image'] = self.smallGraphImg
             self.showChargeMap()
 
+    def sendMail(self):
+        receiver_email = simpledialog.askstring("입력", "이메일을 입력하세요:")
+        # 보낼 이메일 계정 정보
+        sender_email = "alfkcjstk853@tukorea.ac.kr"
+        password = "ylkc fzte deio jcif"
+
+        # 이메일 내용 작성
+        message = MIMEMultipart("alternative")
+        message["Subject"] = "충전소 정보"
+        message["From"] = sender_email
+        message["To"] = receiver_email
+
+        city = self.cityCombobox.get()
+
+        # 이메일 내용 추가 (plain text)
+        text = '주소: ' + self.chargeInfos[city][self.index]['stnAddr'] + '\n'
+        text += '장소: ' + self.chargeInfos[city][self.index]['stnPlace'] + '\n'
+        text += '급속 충전기: ' + str(self.chargeInfos[city][self.index]['rapidCnt']) + '\n'
+        text += '완속충전기: ' + str(self.chargeInfos[city][self.index]['slowCnt'])
+        # 이메일 내용 설정
+        part1 = MIMEText(text, "plain")
+
+        # 이메일에 내용 추가
+        message.attach(part1)
+
+        # Gmail 서버와 연결
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
+
+        messagebox.showinfo("완료", "이메일을 발송했습니다.")
+
     def nextPage(self):
         if self.cityCombobox.get() in self.cities:
             self.page = min(self.page + 1,
@@ -181,7 +219,7 @@ class MainGUI:
         self.infoCanvas.place(x=300, y=5)
 
         self.mailImg = PhotoImage(file='이메일.png')
-        self.mailButton = Button(self.searchFrame, bg='white', image=self.mailImg)
+        self.mailButton = Button(self.searchFrame, bg='white', image=self.mailImg,command=self.sendMail)
         self.mailButton.place(x=490, y=515)
 
         self.mapImg = PhotoImage(file='지도.png')
