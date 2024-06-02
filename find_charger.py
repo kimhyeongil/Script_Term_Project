@@ -110,7 +110,9 @@ class MainGUI:
 
         center = self.kakaomap.geocode(self.chargeInfos[city][self.index]['stnAddr'])
         self.mapView.set_position(*center)
-
+        for city in self.chargeInfos[city]:
+            addr = city['stnAddr']
+            self.mapView.set_marker(*self.kakaomap.geocode(addr))
 
     def changeInfoType(self):
         self.isGraph = not self.isGraph
