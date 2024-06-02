@@ -1,15 +1,15 @@
-import io
 from tkinter import *
 from tkinter import messagebox, simpledialog
 from tkinter.ttk import Combobox
 
 import requests
-from googlemaps import Client
-from PIL import Image, ImageTk
+from tkintermapview import TkinterMapView
+from kakaomap import KakaoMap
 
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+
 
 class MainGUI:
     def __init__(self):
@@ -20,6 +20,7 @@ class MainGUI:
         self.url = "https://bigdata.kepco.co.kr/openapi/v1/EVcharge.do"
         self.key = "GqAUvg9r8nJl20eWk533DCrJwwcbm81kst6Z0fEW"
 
+        self.kakaomap = KakaoMap('0573ceea6c41a38389f3ab94d86e8482')
         self.cities = {'가평군': ['가평군'], '고양시': ['고양시 덕양구', '고양시 일산동구', '고양시 일산서구'],
                        '과천시': ['과천시'], '광명시': ['광명시'], '광주시': ['광주시'], '구리시': ['구리시'],
                        '군포시': ['군포시'], '김포시': ['김포시'], '남양주시': ['남양주시'], '동두천시': ['동두천시'],
@@ -45,9 +46,6 @@ class MainGUI:
             for city in self.cities.keys():
                 if data['city'] in self.cities[city]:
                     self.chargeInfos[city].append(data)
-
-        self.Google_API_Key = 'AIzaSyCzFgc9OGnXckq1-JNhSCVGo9zIq1kSWcE'
-        self.gmaps = Client(key=self.Google_API_Key)
 
         self.isGraph = True
 
@@ -110,24 +108,21 @@ class MainGUI:
         city = self.cityCombobox.get()
         self.infoCanvas.delete('all')
 
-        center = self.gmaps.geocode(self.chargeInfos[city][self.index]['stnAddr'])[0]['geometry']['location']
-        mapURL = f"https://maps.googleapis.com/maps/api/staticmap?center={center['lat']},{center['lng']}&zoom={13}&size=500x500&maptype=roadmap"
-        mapURL += f"&markers=color:red%7C{float(center['lat'])},{float(center['lng'])}"
+        center = self.kakaomap.geocode(self.chargeInfos[city][self.index]['stnAddr'])
+        self.mapView.set_position(*center)
 
-        mapret = requests.get(mapURL + '&key=' + self.Google_API_Key)
-        mapImg = Image.open(io.BytesIO(mapret.content))
-        self.photo = ImageTk.PhotoImage(mapImg)
-        self.infoCanvas.create_image(0, 0, anchor='nw', image=self.photo)
-        self.infoCanvas.create_text(10, 20, text=self.chargeInfos[city][self.index]['stnAddr'],
-                                    anchor="w", font=('consolas', 12, 'bold'))
 
     def changeInfoType(self):
         self.isGraph = not self.isGraph
         if self.isGraph:
             self.mapButton['image'] = self.mapImg
+            self.infoCanvas.place(x=300, y=5)
+            self.mapView.place_forget()
             self.showGraph()
         else:
             self.mapButton['image'] = self.smallGraphImg
+            self.infoCanvas.place_forget()
+            self.mapView.place(x=300, y=5)
             self.showChargeMap()
 
     def sendMail(self):
@@ -216,10 +211,12 @@ class MainGUI:
         self.nextButton.place(x=146, y=50 + (6 * 20 * 4))
 
         self.infoCanvas = Canvas(self.searchFrame, width=500, height=500, bg='white')
+        self.mapView = TkinterMapView(self.searchFrame, width=500, height=500, corner_radius=0)
+
         self.infoCanvas.place(x=300, y=5)
 
         self.mailImg = PhotoImage(file='이메일.png')
-        self.mailButton = Button(self.searchFrame, bg='white', image=self.mailImg,command=self.sendMail)
+        self.mailButton = Button(self.searchFrame, bg='white', image=self.mailImg, command=self.sendMail)
         self.mailButton.place(x=490, y=515)
 
         self.mapImg = PhotoImage(file='지도.png')
@@ -232,9 +229,6 @@ class MainGUI:
         self.telegramButton.place(x=640, y=515)
 
         self.searchFrame.place(x=215, y=10)
-
-
-
 
 
 MainGUI()
