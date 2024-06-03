@@ -2,8 +2,8 @@ from tkinter import *
 import requests
 
 import Data
+from GraphFrame import GraphFrame
 from SearchFrame import SearchFrame
-
 
 
 class MainGUI:
@@ -30,9 +30,10 @@ class MainGUI:
 
         self.initMenu()
 
-        self.searchFrame = SearchFrame(self.window, width=1024, height=624)
-        self.searchFrame.place(x=215, y=10)
-        
+        self.searchFrame = SearchFrame(self.window, width=1024 - 215, height=624)
+        self.graphFrame = GraphFrame(self.window, width=1024 - 215, height=624)
+        # self.searchFrame.place(x=215, y=10)
+        self.graphFrame.place(x=215, y=10)
         self.window.mainloop()
 
     def initMenu(self):
