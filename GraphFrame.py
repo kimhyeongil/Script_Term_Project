@@ -14,7 +14,6 @@ class GraphFrame(Frame):
         super().__init__(**args)
         self.isGraph = True
         self.page = 0
-        self.index = None
         self.initWidget()
         self.cityChargeCnt = dict()
 
@@ -25,13 +24,20 @@ class GraphFrame(Frame):
         self.cityCombobox.bind("<<ComboboxSelected>>", self.OnComboboxSelect)
         self.cityCombobox.place(x=0, y=10)
 
-        self.infoCanvas = Canvas(self, width=800, height=500, bg='white')
-        # self.infoCanvas.place(x=0, y=50)
-        self.mapView = TkinterMapView(self, width=800, height=500, corner_radius=0)
-        self.mapView.place(x=0, y=50)
+        self.infoCanvas = Canvas(self, width=800, height=450, bg='white')
+        self.infoCanvas.place(x=0, y=50)
+        self.mapView = TkinterMapView(self, width=800, height=450, corner_radius=0)
+
+        self.mapImg = PhotoImage(file='지도.png')
+        self.smallGraphImg = PhotoImage(file='그래프.png')
+        self.mapButton = Button(self, bg='white', image=self.mapImg, command=self.change)
+        self.mapButton.place(x=340, y=515)
 
     def OnComboboxSelect(self, event):
-        self.showChargeMap()
+        if self.isGraph:
+            self.showGraph()
+        else:
+            self.showChargeMap()
 
     def showGraph(self):
         city = self.cityCombobox.get()
@@ -74,3 +80,16 @@ class GraphFrame(Frame):
             addr = city['stnAddr']
             if addr:
                 self.mapView.set_marker(*kakaomap.geocode(addr))
+
+    def change(self):
+        self.isGraph = not self.isGraph
+        if self.isGraph:
+            self.mapButton['image'] = self.mapImg
+            self.infoCanvas.place(x=0, y=50)
+            self.mapView.place_forget()
+            self.showGraph()
+        else:
+            self.mapButton['image'] = self.smallGraphImg
+            self.infoCanvas.place_forget()
+            self.mapView.place(x=0, y=50)
+            self.showChargeMap()
