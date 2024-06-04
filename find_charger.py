@@ -32,25 +32,37 @@ class MainGUI:
 
         self.searchFrame = SearchFrame(self.window, width=1024 - 215, height=624)
         self.graphFrame = GraphFrame(self.window, width=1024 - 215, height=624)
-        # self.searchFrame.place(x=215, y=10)
-        self.graphFrame.place(x=215, y=10)
+        self.searchFrame.place(x=215, y=10)
+        self.selected = self.searchFrame
         self.window.mainloop()
 
     def initMenu(self):
         self.menuFrame = Frame(self.window)
-        self.searchImg = PhotoImage(file='검색창.png')
-        self.searchButton = Button(self.menuFrame, text='검색', bg='white', image=self.searchImg)
+        searchImg = PhotoImage(file='검색창.png')
+        self.searchButton = Button(self.menuFrame, text='검색', bg='white', image=searchImg,
+                                   command=lambda: self.changeFrame(self.searchFrame))
+        self.searchButton.image = searchImg
         self.searchButton.grid(row=1, column=0, padx=7, pady=7)
 
-        self.favoriteImg = PhotoImage(file='즐겨찾기창.png')
-        self.favoritesButton = Button(self.menuFrame, text='즐찾', bg='white', image=self.favoriteImg)
+        favoriteImg = PhotoImage(file='즐겨찾기창.png')
+        self.favoritesButton = Button(self.menuFrame, text='즐찾', bg='white', image=favoriteImg)
+        self.favoritesButton.image = favoriteImg
         self.favoritesButton.grid(row=2, column=0, padx=7, pady=7)
 
-        self.graphImg = PhotoImage(file='그래프창.png')
-        self.graphButton = Button(self.menuFrame, text='그래프', bg='white', image=self.graphImg)
+        graphImg = PhotoImage(file='그래프창.png')
+        self.graphButton = Button(self.menuFrame, text='그래프', bg='white', image=graphImg,
+                                  command=lambda: self.changeFrame(self.graphFrame))
+        self.graphButton.image = graphImg
         self.graphButton.grid(row=3, column=0, padx=7, pady=7)
 
         self.menuFrame.place(x=25, y=50)
+
+    def changeFrame(self, frame):
+        if frame != self.selected:
+            print('change')
+            self.selected.place_forget()
+            frame.place(x=215, y=10)
+            self.selected = frame
 
 
 MainGUI()
