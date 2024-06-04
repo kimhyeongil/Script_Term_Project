@@ -26,11 +26,12 @@ class GraphFrame(Frame):
         self.cityCombobox.place(x=0, y=10)
 
         self.infoCanvas = Canvas(self, width=800, height=500, bg='white')
-        self.infoCanvas.place(x=0, y=50)
-        self.mapView = TkinterMapView(self, width=500, height=500, corner_radius=0)
+        # self.infoCanvas.place(x=0, y=50)
+        self.mapView = TkinterMapView(self, width=800, height=500, corner_radius=0)
+        self.mapView.place(x=0, y=50)
 
     def OnComboboxSelect(self, event):
-        self.showGraph()
+        self.showChargeMap()
 
     def showGraph(self):
         city = self.cityCombobox.get()
@@ -49,7 +50,7 @@ class GraphFrame(Frame):
         height = (h - 100) // max(self.cityChargeCnt[city].values())
 
         w = int(self.infoCanvas['width'])
-        wOffset = 10
+        wOffset = 25
         width = (w - wOffset * 2) // len(self.cityChargeCnt[city])
 
         for i, (town, cnt) in enumerate(self.cityChargeCnt[city].items()):
@@ -71,4 +72,5 @@ class GraphFrame(Frame):
         self.mapView.set_position(*center)
         for city in Data.chargeInfos[city]:
             addr = city['stnAddr']
-            self.mapView.set_marker(*kakaomap.geocode(addr))
+            if addr:
+                self.mapView.set_marker(*kakaomap.geocode(addr))
