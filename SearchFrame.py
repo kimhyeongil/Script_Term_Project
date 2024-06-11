@@ -10,6 +10,7 @@ from tkintermapview import TkinterMapView
 
 import Data
 import kakaomap
+import telegram
 
 
 class SearchFrame(Frame):
@@ -67,7 +68,7 @@ class SearchFrame(Frame):
         self.mapButton.place(x=340, y=515)
 
         telegramImg = PhotoImage(file='텔레그램.png')
-        self.telegramButton = Button(self, bg='white', image=telegramImg)
+        self.telegramButton = Button(self, bg='white', image=telegramImg, command=self.sendTelebot)
         self.telegramButton.image = telegramImg
         self.telegramButton.place(x=640, y=515)
 
@@ -96,6 +97,16 @@ class SearchFrame(Frame):
                     self.bookmarkButtons[index]['image'] = self.checkImg
         print(Data.bookmarkCities)
 
+    def sendTelebot(self):
+        city = self.cityCombobox.get()
+        print(self.index)
+        if self.index and city in Data.cities:
+            text = '주소: ' + Data.chargeInfos[city][self.index]['stnAddr'] + '\n'
+            text += '장소: ' + Data.chargeInfos[city][self.index]['stnPlace'] + '\n'
+            text += '급속 충전기: ' + str(Data.chargeInfos[city][self.index]['rapidCnt']) + '\n'
+            text += '완속 충전기: ' + str(Data.chargeInfos[city][self.index]['slowCnt'])
+            telegram.send(text)
+
     def showChargeList(self):
         city = self.cityCombobox.get()
         if city not in Data.cities:
@@ -106,6 +117,7 @@ class SearchFrame(Frame):
         for i in range(len(self.chargeLabels)):
             index = i + self.page * len(self.chargeLabels)
             if index < len(Data.chargeInfos[city]):
+                self.index = index
                 self.chargeLabels[i][
                     'text'] = f"주소: {Data.chargeInfos[city][index]['stnAddr']}\n장소: {Data.chargeInfos[city][index]['stnPlace']}"
                 self.bookmarkButtons[i].place(x=250, y=50 + (i * 20 * 4))
