@@ -1,7 +1,9 @@
 from tkinter import *
 import requests
+from telepot.loop import MessageLoop
 
 import Data
+import telegram
 from GraphFrame import GraphFrame
 from SearchFrame import SearchFrame
 from bookmarkFrame import BookmarkFrame
@@ -36,6 +38,8 @@ class MainGUI:
         self.bookmarkFrame = BookmarkFrame(self.window, width=1024 - 215, height=624)
         self.selected = self.searchFrame
         self.selected.place(x=215, y=10)
+
+        MessageLoop(telegram.bot, telegram.handle).run_as_thread()
 
         self.window.mainloop()
 
