@@ -4,6 +4,7 @@ import requests
 import Data
 from GraphFrame import GraphFrame
 from SearchFrame import SearchFrame
+from bookmarkFrame import BookmarkFrame
 
 
 class MainGUI:
@@ -32,8 +33,10 @@ class MainGUI:
 
         self.searchFrame = SearchFrame(self.window, width=1024 - 215, height=624)
         self.graphFrame = GraphFrame(self.window, width=1024 - 215, height=624)
-        self.searchFrame.place(x=215, y=10)
+        self.bookmarkFrame = BookmarkFrame(self.window, width=1024 - 215, height=624)
         self.selected = self.searchFrame
+        self.selected.place(x=215, y=10)
+
         self.window.mainloop()
 
     def initMenu(self):
@@ -44,10 +47,11 @@ class MainGUI:
         self.searchButton.image = searchImg
         self.searchButton.grid(row=1, column=0, padx=7, pady=7)
 
-        favoriteImg = PhotoImage(file='즐겨찾기창.png')
-        self.favoritesButton = Button(self.menuFrame, text='즐찾', bg='white', image=favoriteImg)
-        self.favoritesButton.image = favoriteImg
-        self.favoritesButton.grid(row=2, column=0, padx=7, pady=7)
+        bookmarkImg = PhotoImage(file='즐겨찾기창.png')
+        self.bookmarkButton = Button(self.menuFrame, text='즐찾', bg='white', image=bookmarkImg,
+                                     command=lambda: self.changeFrame(self.bookmarkFrame))
+        self.bookmarkButton.image = bookmarkImg
+        self.bookmarkButton.grid(row=2, column=0, padx=7, pady=7)
 
         graphImg = PhotoImage(file='그래프창.png')
         self.graphButton = Button(self.menuFrame, text='그래프', bg='white', image=graphImg,
