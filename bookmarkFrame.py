@@ -9,6 +9,7 @@ from tkintermapview import TkinterMapView
 
 import Data
 import kakaomap
+import telegram
 
 
 class BookmarkFrame(Frame):
@@ -65,7 +66,7 @@ class BookmarkFrame(Frame):
         self.mapButton.place(x=340, y=515)
 
         telegramImg = PhotoImage(file='텔레그램.png')
-        self.telegramButton = Button(self, bg='white', image=telegramImg)
+        self.telegramButton = Button(self, bg='white', image=telegramImg, command=self.sendTelebot)
         self.telegramButton.image = telegramImg
         self.telegramButton.place(x=640, y=515)
 
@@ -88,7 +89,7 @@ class BookmarkFrame(Frame):
 
     def showGraph(self):
         self.infoCanvas.delete('all')
-        if not self.index:
+        if self.index is None:
             return
 
         offset = int(self.infoCanvas['height']) - 50
@@ -115,12 +116,21 @@ class BookmarkFrame(Frame):
 
     def showChargeMap(self):
         self.infoCanvas.delete('all')
+        if self.index:
+            center = kakaomap.geocode(Data.bookmarkCities[self.index]['stnAddr'])
+            self.mapView.set_position(*center)
+            for city in Data.bookmarkCities:
+                addr = city['stnAddr']
+                self.mapView.set_marker(*kakaomap.geocode(addr))
 
-        center = kakaomap.geocode(Data.bookmarkCities[self.index]['stnAddr'])
-        self.mapView.set_position(*center)
-        for city in Data.bookmarkCities:
-            addr = city['stnAddr']
-            self.mapView.set_marker(*kakaomap.geocode(addr))
+    def sendTelebot(self):
+        text = str()
+        for info in Data.bookmarkCities:
+            text += '주소: ' + info['stnAddr'] + '\n'
+            text += '장소: ' + info['stnPlace'] + '\n'
+            text += '급속 충전기: ' + str(info['rapidCnt']) + '\n'
+            text += '완속 충전기: ' + str(info['slowCnt']) + '\n'
+        telegram.send(text)
 
     def changeInfoType(self):
         self.isGraph = not self.isGraph
