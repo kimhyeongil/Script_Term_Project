@@ -13,7 +13,6 @@ class GraphFrame(Frame):
     def __init__(self, master, **args):
         super().__init__(**args)
         self.isGraph = True
-        self.page = 0
         self.initWidget()
         self.cityChargeCnt = dict()
 
@@ -32,6 +31,14 @@ class GraphFrame(Frame):
         self.smallGraphImg = PhotoImage(file='그래프.png')
         self.mapButton = Button(self, bg='white', image=self.mapImg, command=self.change)
         self.mapButton.place(x=340, y=515)
+
+    def OnEnable(self):
+        self.cityCombobox.set('시/군')
+        self.isGraph = True
+        self.mapButton['image'] = self.mapImg
+        self.infoCanvas.place(x=0, y=50)
+        self.mapView.place_forget()
+        self.infoCanvas.delete('all')
 
     def OnComboboxSelect(self, event):
         if self.isGraph:

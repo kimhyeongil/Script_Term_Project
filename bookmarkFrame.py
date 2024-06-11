@@ -19,6 +19,16 @@ class BookmarkFrame(Frame):
         self.index = None
         self.initWidget()
 
+    def OnEnable(self):
+        self.isGraph = True
+        self.page = 0
+        self.index = None
+        self.showChargeList()
+        self.mapButton['image'] = self.mapImg
+        self.infoCanvas.place(x=300, y=5)
+        self.mapView.place_forget()
+        self.showGraph()
+
     def initWidget(self):
         self.chargeLabels = [Label(self, width=28, height=4, wraplength=240,
                                    font=('arial', 12, 'bold'), anchor="nw", justify="left",
@@ -69,16 +79,17 @@ class BookmarkFrame(Frame):
                 self.chargeLabels[i]['text'] = ''
 
     def OnClickInfoListLabel(self, event, index):
-        if city in Data.bookmarkCities:
-            if index + self.page * len(self.chargeLabels) < len(Data.bookmarkCities):
-                self.index = index + self.page * len(self.chargeLabels)
-                if self.isGraph:
-                    self.showGraph()
-                else:
-                    self.showChargeMap()
+        if index + self.page * len(self.chargeLabels) < len(Data.bookmarkCities):
+            self.index = index + self.page * len(self.chargeLabels)
+            if self.isGraph:
+                self.showGraph()
+            else:
+                self.showChargeMap()
 
     def showGraph(self):
         self.infoCanvas.delete('all')
+        if not self.index:
+            return
 
         offset = int(self.infoCanvas['height']) - 50
         height = 35
@@ -158,7 +169,7 @@ class BookmarkFrame(Frame):
 
     def nextPage(self):
         self.page = min(self.page + 1,
-                            (len(Data.bookmarkCities) - 1) // len(self.chargeLabels))
+                        (len(Data.bookmarkCities) - 1) // len(self.chargeLabels))
         self.showChargeList()
 
     def prevPage(self):

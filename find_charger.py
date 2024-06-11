@@ -67,6 +67,7 @@ class MainGUI:
             self.selected.place_forget()
             frame.place(x=215, y=10)
             self.selected = frame
+            self.selected.OnEnable()
 
 
 MainGUI()

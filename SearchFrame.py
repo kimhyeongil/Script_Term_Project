@@ -40,7 +40,6 @@ class SearchFrame(Frame):
         for i in range(len(self.chargeLabels)):
             self.chargeLabels[i].bind("<Button-1>", lambda event, index=i: self.OnClickInfoListLabel(event, index))
             self.chargeLabels[i].place(x=0, y=50 + (i * 20 * 4))
-            self.bookmarkButtons[i].place(x=250, y=50 + (i * 20 * 4))
 
         prevImg = PhotoImage(file='왼쪽이동.png')
         self.prevButton = Button(self, bg='white', image=prevImg, command=self.prevPage)
@@ -72,6 +71,17 @@ class SearchFrame(Frame):
         self.telegramButton.image = telegramImg
         self.telegramButton.place(x=640, y=515)
 
+    def OnEnable(self):
+        self.isGraph = True
+        self.page = 0
+        self.cityCombobox.set('시/군')
+        self.index = None
+        self.mapButton['image'] = self.mapImg
+        self.infoCanvas.place(x=300, y=5)
+        self.mapView.place_forget()
+        self.infoCanvas.delete('all')
+        self.showChargeList()
+
     def OnClickButton(self, index):
         city = self.cityCombobox.get()
 
@@ -88,6 +98,11 @@ class SearchFrame(Frame):
 
     def showChargeList(self):
         city = self.cityCombobox.get()
+        if city not in Data.cities:
+            for i in range(len(self.chargeLabels)):
+                self.chargeLabels[i]['text'] = ''
+                self.bookmarkButtons[i].place_forget()
+            return
         for i in range(len(self.chargeLabels)):
             index = i + self.page * len(self.chargeLabels)
             if index < len(Data.chargeInfos[city]):
@@ -120,7 +135,8 @@ class SearchFrame(Frame):
     def showGraph(self):
         city = self.cityCombobox.get()
         self.infoCanvas.delete('all')
-
+        if city not in Data.cities:
+            return
         offset = int(self.infoCanvas['height']) - 50
         height = 35
 
@@ -146,6 +162,8 @@ class SearchFrame(Frame):
     def showChargeMap(self):
         city = self.cityCombobox.get()
         self.infoCanvas.delete('all')
+        if city not in Data.cities:
+            return
 
         center = kakaomap.geocode(Data.chargeInfos[city][self.index]['stnAddr'])
         self.mapView.set_position(*center)
