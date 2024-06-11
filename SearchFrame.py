@@ -27,13 +27,20 @@ class SearchFrame(Frame):
         self.cityCombobox.bind("<<ComboboxSelected>>", self.OnComboboxSelect)
         self.cityCombobox.place(x=0, y=10)
 
-        self.chargeLabels = [Label(self, width=28, height=4, wraplength=260,
+        self.chargeLabels = [Label(self, width=28, height=4, wraplength=240,
                                    font=('arial', 12, 'bold'), anchor="nw", justify="left",
                                    bg='#f9f6f2' if i & 1 else '#D3D3D3')
                              for i in range(6)]
+        self.uncheckImg = PhotoImage(file="즐겨찾기 미선택.png")
+        self.checkImg = PhotoImage(file="즐겨찾기 선택.png")
+
+        self.bookmarkButtons = [
+            Button(self, image=self.uncheckImg, command=lambda index=i: self.OnClickButton(index)) for i
+            in range(6)]
         for i in range(len(self.chargeLabels)):
             self.chargeLabels[i].bind("<Button-1>", lambda event, index=i: self.OnClickInfoListLabel(event, index))
             self.chargeLabels[i].place(x=0, y=50 + (i * 20 * 4))
+            self.bookmarkButtons[i].place(x=250, y=50 + (i * 20 * 4))
 
         prevImg = PhotoImage(file='왼쪽이동.png')
         self.prevButton = Button(self, bg='white', image=prevImg, command=self.prevPage)
@@ -65,6 +72,20 @@ class SearchFrame(Frame):
         self.telegramButton.image = telegramImg
         self.telegramButton.place(x=640, y=515)
 
+    def OnClickButton(self, index):
+        city = self.cityCombobox.get()
+
+        if city in Data.cities:
+            if index + self.page * len(self.chargeLabels) < len(Data.chargeInfos[city]):
+                self.index = index + self.page * len(self.chargeLabels)
+                if Data.chargeInfos[city][self.index] in Data.bookmarkCities:
+                    Data.bookmarkCities.remove(Data.chargeInfos[city][self.index])
+                    self.bookmarkButtons[index]['image'] = self.uncheckImg
+                else:
+                    Data.bookmarkCities.append(Data.chargeInfos[city][self.index])
+                    self.bookmarkButtons[index]['image'] = self.checkImg
+        print(Data.bookmarkCities)
+
     def showChargeList(self):
         city = self.cityCombobox.get()
         for i in range(len(self.chargeLabels)):
@@ -72,8 +93,14 @@ class SearchFrame(Frame):
             if index < len(Data.chargeInfos[city]):
                 self.chargeLabels[i][
                     'text'] = f"주소: {Data.chargeInfos[city][index]['stnAddr']}\n장소: {Data.chargeInfos[city][index]['stnPlace']}"
+                self.bookmarkButtons[i].place(x=250, y=50 + (i * 20 * 4))
+                if Data.chargeInfos[city][index] in Data.bookmarkCities:
+                    self.bookmarkButtons[i]['image'] = self.checkImg
+                else:
+                    self.bookmarkButtons[i]['image'] = self.uncheckImg
             else:
                 self.chargeLabels[i]['text'] = ''
+                self.bookmarkButtons[i].place_forget()
 
     def OnComboboxSelect(self, event):
         self.page = 0

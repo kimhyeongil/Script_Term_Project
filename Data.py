@@ -12,3 +12,4 @@ cities = {'가평군': ['가평군'], '고양시': ['고양시 덕양구', '고�
 
 chargeInfos = None
 
+bookmarkCities = []
