@@ -100,8 +100,7 @@ class SearchFrame(Frame):
 
     def sendTelebot(self):
         city = self.cityCombobox.get()
-        print(self.index)
-        if self.index and city in Data.cities:
+        if self.index is not None and city in Data.cities:
             text = '주소: ' + Data.chargeInfos[city][self.index]['stnAddr'] + '\n'
             text += '장소: ' + Data.chargeInfos[city][self.index]['stnPlace'] + '\n'
             text += '급속 충전기: ' + str(Data.chargeInfos[city][self.index]['rapidCnt']) + '\n'
