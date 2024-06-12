@@ -40,7 +40,16 @@ def handle(msg):
                     send('즐겨찾기에 추가했습니다.')
                     return
             send(f'{args[1]}에는 {place}가 없습니다.')
-
+    elif text.startswith('즐찾삭제') and len(args) > 1:
+        place = ''
+        for i in range(1, len(args)):
+            place += args[i]
+        for index, info in enumerate(Data.bookmarkCities):
+            if info['stnPlace'] == place:
+                Data.bookmarkCities.pop(index)
+                send('삭제했습니다.')
+                return
+            send(f'즐겨찾기에 {place}가 없습니다.')
     elif text.startswith('즐찾보기'):
         for info in Data.bookmarkCities:
             response = '주소: ' + info['stnAddr'] + '\n'
