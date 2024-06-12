@@ -1,3 +1,5 @@
+import spam
+
 cities = {'가평군': ['가평군'], '고양시': ['고양시 덕양구', '고양시 일산동구', '고양시 일산서구'],
           '과천시': ['과천시'], '광명시': ['광명시'], '광주시': ['광주시'], '구리시': ['구리시'],
           '군포시': ['군포시'], '김포시': ['김포시'], '남양주시': ['남양주시'], '동두천시': ['동두천시'],
@@ -13,3 +15,21 @@ cities = {'가평군': ['가평군'], '고양시': ['고양시 덕양구', '고�
 chargeInfos = None
 
 bookmarkCities = []
+
+with open('API키', 'rb') as file:
+    key = file.read().decode('utf-8')
+    key = spam.decrypt(key)
+
+with open('카카오키', 'rb') as file:
+    kakaokey = file.read().decode('utf-8')
+    kakaokey = spam.decrypt(kakaokey)
+
+with open('텔레그램토큰', 'rb') as file:
+    teleToken = file.read().decode('utf-8')
+    teleToken = spam.decrypt(teleToken)
+
+with open('메일비번', 'rb') as file:
+    password = file.read().decode('utf-8')
+    password = spam.decrypt(password)
+
+print('데이터 실행')

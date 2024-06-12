@@ -2,13 +2,12 @@ import telepot
 
 import Data
 
-TOKEN = '7346972907:AAHjOjI87ifl9PyNCVzpkWjl13kFzbuGAe8'
-MAX_MSG_LENGTH = 300
-bot = telepot.Bot(TOKEN)
+bot = telepot.Bot(Data.teleToken)
 
 
 def send(msg):
     bot.sendMessage(7472852890, msg)
+
 
 def handle(msg):
     print('handle msg')
@@ -31,4 +30,4 @@ def handle(msg):
         else:
             send('경기도엔 그런 지역이 없습니다.')
     else:
-        send(chat_id, '모르는 명령어입니다.\n지역 [시/군] 명령을 입력하세요.')
+        send('모르는 명령어입니다.\n지역 [시/군], 즐찾추가 [시/군] [장소], 즐찾보기 중 한 명령을 입력하세요.')

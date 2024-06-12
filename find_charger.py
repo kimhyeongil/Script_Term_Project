@@ -1,3 +1,4 @@
+import spam
 from tkinter import *
 import requests
 from telepot.loop import MessageLoop
@@ -6,7 +7,7 @@ import Data
 import telegram
 from GraphFrame import GraphFrame
 from SearchFrame import SearchFrame
-from bookmarkFrame import BookmarkFrame
+from BookmarkFrame import BookmarkFrame
 
 
 class MainGUI:
@@ -16,7 +17,10 @@ class MainGUI:
         self.window.geometry('1024x624')
 
         self.url = "https://bigdata.kepco.co.kr/openapi/v1/EVcharge.do"
-        self.key = "GqAUvg9r8nJl20eWk533DCrJwwcbm81kst6Z0fEW"
+        with open('API키', 'rb') as file:
+            self.key = file.read().decode('utf-8')
+            self.key = spam.decrypt(self.key)
+
 
         params = {
             "metroCd": 31,

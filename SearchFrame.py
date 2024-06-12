@@ -200,7 +200,6 @@ class SearchFrame(Frame):
         receiver_email = simpledialog.askstring("입력", "이메일을 입력하세요:")
         # 보낼 이메일 계정 정보
         sender_email = "alfkcjstk853@tukorea.ac.kr"
-        password = "ylkc fzte deio jcif"
 
         # 이메일 내용 작성
         message = MIMEMultipart("alternative")
@@ -224,7 +223,7 @@ class SearchFrame(Frame):
         # Gmail 서버와 연결
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(sender_email, password)
+            server.login(sender_email, Data.password)
             server.sendmail(sender_email, receiver_email, message.as_string())
 
         messagebox.showinfo("완료", "이메일을 발송했습니다.")

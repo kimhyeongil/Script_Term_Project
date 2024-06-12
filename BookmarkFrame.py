@@ -149,7 +149,6 @@ class BookmarkFrame(Frame):
         receiver_email = simpledialog.askstring("입력", "이메일을 입력하세요:")
         # 보낼 이메일 계정 정보
         sender_email = "alfkcjstk853@tukorea.ac.kr"
-        password = "ylkc fzte deio jcif"
 
         # 이메일 내용 작성
         message = MIMEMultipart("alternative")
@@ -157,9 +156,10 @@ class BookmarkFrame(Frame):
         message["From"] = sender_email
         message["To"] = receiver_email
 
+        text = str()
         # 이메일 내용 추가 (plain text)
         for city in Data.bookmarkCities:
-            text = '주소: ' + city['stnAddr'] + '\n'
+            text += '주소: ' + city['stnAddr'] + '\n'
             text += '장소: ' + city['stnPlace'] + '\n'
             text += '급속 충전기: ' + str(city['rapidCnt']) + '\n'
             text += '완속 충전기: ' + str(city['slowCnt']) + '\n'
@@ -172,7 +172,7 @@ class BookmarkFrame(Frame):
         # Gmail 서버와 연결
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(sender_email, password)
+            server.login(sender_email, Data.password)
             server.sendmail(sender_email, receiver_email, message.as_string())
 
         messagebox.showinfo("완료", "이메일을 발송했습니다.")

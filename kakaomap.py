@@ -1,9 +1,11 @@
 import requests
 
+import Data
+
 
 def geocode(addr):
     url = 'https://dapi.kakao.com/v2/local/search/address.json'
-    headers = {"Authorization": "KakaoAK 0573ceea6c41a38389f3ab94d86e8482"}
+    headers = {"Authorization": "KakaoAK " + Data.kakaokey}
     params = {'query': addr}
 
     response = requests.get(url, headers=headers, params=params)
