@@ -32,7 +32,8 @@ def handle(msg):
     elif text.startswith('즐찾추가') and len(args) > 2:
         place = ''
         for i in range(2, len(args)):
-            place += args[i]
+            place += args[i] + ' '
+        place = place[:-1]
         if args[1] in Data.chargeInfos:
             for info in Data.chargeInfos[args[1]]:
                 if info['stnPlace'] == place:
