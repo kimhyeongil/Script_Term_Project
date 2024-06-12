@@ -116,12 +116,14 @@ class BookmarkFrame(Frame):
 
     def showChargeMap(self):
         self.infoCanvas.delete('all')
-        if self.index:
-            center = kakaomap.geocode(Data.bookmarkCities[self.index]['stnAddr'])
-            self.mapView.set_position(*center)
-            for city in Data.bookmarkCities:
-                addr = city['stnAddr']
-                self.mapView.set_marker(*kakaomap.geocode(addr))
+        if self.index is None:
+            return
+
+        center = kakaomap.geocode(Data.bookmarkCities[self.index]['stnAddr'])
+        self.mapView.set_position(*center)
+        for city in Data.bookmarkCities:
+            addr = city['stnAddr']
+            self.mapView.set_marker(*kakaomap.geocode(addr))
 
     def sendTelebot(self):
         text = str()
