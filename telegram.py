@@ -44,7 +44,8 @@ def handle(msg):
     elif text.startswith('즐찾삭제') and len(args) > 1:
         place = ''
         for i in range(1, len(args)):
-            place += args[i]
+            place += args[i] + ' '
+        place = place[:-1]
         for index, info in enumerate(Data.bookmarkCities):
             if info['stnPlace'] == place:
                 Data.bookmarkCities.pop(index)
