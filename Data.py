@@ -31,5 +31,3 @@ with open('텔레그램토큰', 'rb') as file:
 with open('메일비번', 'rb') as file:
     password = file.read().decode('utf-8')
     password = spam.decrypt(password)
-
-print('데이터 실행')

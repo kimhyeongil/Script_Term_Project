@@ -14,6 +14,7 @@ class GraphFrame(Frame):
         super().__init__(**args)
         self.isGraph = True
         self.initWidget()
+        self.markers = []
         self.cityChargeCnt = dict()
 
     def initWidget(self):
@@ -81,12 +82,18 @@ class GraphFrame(Frame):
         city = self.cityCombobox.get()
         self.infoCanvas.delete('all')
 
+        if city not in Data.cities:
+            return
+        for marker in self.markers:
+            marker.delete()
+        self.markers = []
         center = kakaomap.geocode(city)
         self.mapView.set_position(*center)
         for city in Data.chargeInfos[city]:
             addr = city['stnAddr']
-            if addr:
-                self.mapView.set_marker(*kakaomap.geocode(addr))
+            geocode = kakaomap.geocode(addr)
+            if geocode[0] is not None:
+                self.markers.append(self.mapView.set_marker(*geocode))
 
     def change(self):
         self.isGraph = not self.isGraph

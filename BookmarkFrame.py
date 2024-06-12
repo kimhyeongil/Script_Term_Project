@@ -18,6 +18,7 @@ class BookmarkFrame(Frame):
         self.isGraph = True
         self.page = 0
         self.index = None
+        self.markers = []
         self.initWidget()
 
     def OnEnable(self):
@@ -118,12 +119,16 @@ class BookmarkFrame(Frame):
         self.infoCanvas.delete('all')
         if self.index is None:
             return
-
+        for marker in self.markers:
+            marker.delete()
+        self.markers = []
         center = kakaomap.geocode(Data.bookmarkCities[self.index]['stnAddr'])
         self.mapView.set_position(*center)
         for city in Data.bookmarkCities:
             addr = city['stnAddr']
-            self.mapView.set_marker(*kakaomap.geocode(addr))
+            geocode = kakaomap.geocode(addr)
+            if geocode[0] is not None:
+                self.markers.append(self.mapView.set_marker(*geocode))
 
     def sendTelebot(self):
         text = str()

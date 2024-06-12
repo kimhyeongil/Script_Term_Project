@@ -19,6 +19,7 @@ class SearchFrame(Frame):
         self.isGraph = True
         self.page = 0
         self.index = None
+        self.markers = []
         self.initWidget()
 
     def initWidget(self):
@@ -176,12 +177,16 @@ class SearchFrame(Frame):
         self.infoCanvas.delete('all')
         if city not in Data.cities:
             return
-
+        for marker in self.markers:
+            marker.delete()
+        self.markers = []
         center = kakaomap.geocode(Data.chargeInfos[city][self.index]['stnAddr'])
         self.mapView.set_position(*center)
         for city in Data.chargeInfos[city]:
             addr = city['stnAddr']
-            self.mapView.set_marker(*kakaomap.geocode(addr))
+            geocode = kakaomap.geocode(addr)
+            if geocode[0] is not None:
+                self.markers.append(self.mapView.set_marker(*geocode))
 
     def changeInfoType(self):
         self.isGraph = not self.isGraph
