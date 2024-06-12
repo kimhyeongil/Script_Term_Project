@@ -49,7 +49,7 @@ def handle(msg):
                 Data.bookmarkCities.pop(index)
                 send('삭제했습니다.')
                 return
-            send(f'즐겨찾기에 {place}가 없습니다.')
+        send(f'즐겨찾기에 {place}가 없습니다.')
     elif text.startswith('즐찾보기'):
         for info in Data.bookmarkCities:
             response = '주소: ' + info['stnAddr'] + '\n'
